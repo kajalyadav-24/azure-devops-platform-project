@@ -1,4 +1,4 @@
-﻿from flask import Flask, jsonify
+﻿from flask import Flask, jsonify, render_template
 import os
 import socket
 from datetime import datetime, timezone
@@ -11,12 +11,39 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "dev")
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify(
-        application="Azure DevOps Incident Service",
-        status="running",
+    incidents = [
+        {
+            "id": 1001,
+            "title": "High CPU utilization",
+            "severity": "P2",
+            "status": "Resolved",
+            "service": "payment-api"
+        },
+        {
+            "id": 1002,
+            "title": "Application health probe failure",
+            "severity": "P3",
+            "status": "Monitoring",
+            "service": "incident-api"
+        },
+        {
+            "id": 1003,
+            "title": "AKS pod restart detected",
+            "severity": "P3",
+            "status": "Investigating",
+            "service": "frontend-service"
+        }
+    ]
+
+    return render_template(
+        "index.html",
+        app_name="Azure Cloud Operations Platform",
         environment=ENVIRONMENT,
-        version=APP_VERSION
-    ), 200
+        version=APP_VERSION,
+        hostname=socket.gethostname(),
+        incidents=incidents,
+        current_time=datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    )
 
 
 @app.route("/health", methods=["GET"])
@@ -38,22 +65,31 @@ def version():
 
 @app.route("/api/incidents", methods=["GET"])
 def incidents():
-    sample_incidents = [
+    incident_data = [
         {
             "id": 1001,
             "title": "High CPU utilization",
             "severity": "P2",
-            "status": "Resolved"
+            "status": "Resolved",
+            "service": "payment-api"
         },
         {
             "id": 1002,
             "title": "Application health probe failure",
             "severity": "P3",
-            "status": "Monitoring"
+            "status": "Monitoring",
+            "service": "incident-api"
+        },
+        {
+            "id": 1003,
+            "title": "AKS pod restart detected",
+            "severity": "P3",
+            "status": "Investigating",
+            "service": "frontend-service"
         }
     ]
 
-    return jsonify(sample_incidents), 200
+    return jsonify(incident_data), 200
 
 
 if __name__ == "__main__":

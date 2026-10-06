@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ app_name }}</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='styles.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">AZ</div>
+
+            <div>
+                <h2>CloudOps</h2>
+                <span>Platform Engineering</span>
+            </div>
+        </div>
+
+        <nav>
+
+            <a class="nav-item active" href="/">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a class="nav-item" href="/api/incidents">
+                <span>⚠</span>
+                Incidents
+            </a>
+
+            <a class="nav-item" href="/health">
+                <span>♡</span>
+                Health API
+            </a>
+
+            <a class="nav-item" href="/version">
+                <span>◇</span>
+                Version
+            </a>
+
+        </nav>
+
+        <div class="sidebar-footer">
+
+            <div class="environment-label">
+                Environment
+            </div>
+
+            <div class="environment-badge">
+                {{ environment }}
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main">
+
+        <!-- Header -->
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="page-label">
+                    AZURE DEVOPS PLATFORM
+                </p>
+
+                <h1>
+                    Operations Dashboard
+                </h1>
+
+                <p class="subtitle">
+                    Infrastructure, application health and incident visibility
+                </p>
+
+            </div>
+
+            <div class="top-status">
+
+                <span class="status-dot"></span>
+
+                Platform Healthy
+
+            </div>
+
+        </header>
+
+
+        <!-- Metrics -->
+
+        <section class="metrics">
+
+            <div class="metric-card">
+
+                <div class="metric-header">
+                    APPLICATION
+                </div>
+
+                <div class="metric-value">
+                    Online
+                </div>
+
+                <div class="metric-footer success">
+                    ● Healthy
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-header">
+                    ENVIRONMENT
+                </div>
+
+                <div class="metric-value">
+                    {{ environment | upper }}
+                </div>
+
+                <div class="metric-footer">
+                    Kubernetes workload
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-header">
+                    VERSION
+                </div>
+
+                <div class="metric-value">
+                    v{{ version }}
+                </div>
+
+                <div class="metric-footer">
+                    Container release
+                </div>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-header">
+                    ACTIVE INCIDENTS
+                </div>
+
+                <div class="metric-value">
+                    {{ incidents | length }}
+                </div>
+
+                <div class="metric-footer warning">
+                    Monitoring
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Platform -->
+
+        <section class="content-grid">
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="section-label">
+                            PLATFORM STATUS
+                        </p>
+
+                        <h2>
+                            Infrastructure Overview
+                        </h2>
+
+                    </div>
+
+                    <span class="healthy-badge">
+                        Operational
+                    </span>
+
+                </div>
+
+
+                <div class="platform-list">
+
+
+                    <div class="platform-row">
+
+                        <div class="platform-icon">
+                            AKS
+                        </div>
+
+                        <div class="platform-info">
+
+                            <strong>
+                                Azure Kubernetes Service
+                            </strong>
+
+                            <span>
+                                Container orchestration
+                            </span>
+
+                        </div>
+
+                        <span class="state healthy">
+                            Healthy
+                        </span>
+
+                    </div>
+
+
+                    <div class="platform-row">
+
+                        <div class="platform-icon">
+                            ACR
+                        </div>
+
+                        <div class="platform-info">
+
+                            <strong>
+                                Azure Container Registry
+                            </strong>
+
+                            <span>
+                                Docker image repository
+                            </span>
+
+                        </div>
+
+                        <span class="state healthy">
+                            Connected
+                        </span>
+
+                    </div>
+
+
+                    <div class="platform-row">
+
+                        <div class="platform-icon">
+                            KV
+                        </div>
+
+                        <div class="platform-info">
+
+                            <strong>
+                                Azure Key Vault
+                            </strong>
+
+                            <span>
+                                Secrets management
+                            </span>
+
+                        </div>
+
+                        <span class="state healthy">
+                            Secured
+                        </span>
+
+                    </div>
+
+
+                    <div class="platform-row">
+
+                        <div class="platform-icon">
+                            MON
+                        </div>
+
+                        <div class="platform-info">
+
+                            <strong>
+                                Azure Monitor
+                            </strong>
+
+                            <span>
+                                Metrics and observability
+                            </span>
+
+                        </div>
+
+                        <span class="state healthy">
+                            Active
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Runtime -->
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p class="section-label">
+                            RUNTIME
+                        </p>
+
+                        <h2>
+                            Application Details
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="runtime-info">
+
+                    <div class="runtime-row">
+
+                        <span>Hostname</span>
+
+                        <strong>
+                            {{ hostname }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="runtime-row">
+
+                        <span>Application</span>
+
+                        <strong>
+                            Incident API
+                        </strong>
+
+                    </div>
+
+
+                    <div class="runtime-row">
+
+                        <span>Port</span>
+
+                        <strong>
+                            8080
+                        </strong>
+
+                    </div>
+
+
+                    <div class="runtime-row">
+
+                        <span>Environment</span>
+
+                        <strong>
+                            {{ environment }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="runtime-row">
+
+                        <span>Release</span>
+
+                        <strong>
+                            {{ version }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="runtime-row">
+
+                        <span>Last Check</span>
+
+                        <strong>
+                            {{ current_time }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Incidents -->
+
+        <section class="panel incidents-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p class="section-label">
+                        INCIDENT MANAGEMENT
+                    </p>
+
+                    <h2>
+                        Recent Incidents
+                    </h2>
+
+                </div>
+
+                <a
+                    class="api-button"
+                    href="/api/incidents"
+                >
+                    View API
+                </a>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Incident
+                            </th>
+
+                            <th>
+                                Service
+                            </th>
+
+                            <th>
+                                Severity
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                    {% for incident in incidents %}
+
+                        <tr>
+
+                            <td class="incident-id">
+                                INC-{{ incident.id }}
+                            </td>
+
+                            <td>
+                                {{ incident.title }}
+                            </td>
+
+                            <td>
+                                {{ incident.service }}
+                            </td>
+
+                            <td>
+
+                                <span class="severity {{ incident.severity | lower }}">
+
+                                    {{ incident.severity }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="incident-status">
+
+                                    {{ incident.status }}
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- Architecture -->
+
+        <section class="panel architecture-panel">
+
+            <p class="section-label">
+                DEVOPS WORKFLOW
+            </p>
+
+            <h2>
+                Deployment Architecture
+            </h2>
+
+
+            <div class="architecture-flow">
+
+                <div class="architecture-item">
+                    GitHub
+                </div>
+
+                <span>
+                    →
+                </span>
+
+                <div class="architecture-item">
+                    Actions
+                </div>
+
+                <span>
+                    →
+                </span>
+
+                <div class="architecture-item">
+                    Docker
+                </div>
+
+                <span>
+                    →
+                </span>
+
+                <div class="architecture-item">
+                    ACR
+                </div>
+
+                <span>
+                    →
+                </span>
+
+                <div class="architecture-item">
+                    AKS
+                </div>
+
+                <span>
+                    →
+                </span>
+
+                <div class="architecture-item">
+                    Azure Monitor
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            Azure Cloud Operations Platform · Version {{ version }}
+
+        </footer>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>
+
