@@ -56,3 +56,14 @@ variable "subnets" {
     }
   }
 }
+variable "acr_name_prefix" {
+  description = "Prefix used for the development Azure Container Registry."
+  type        = string
+  default     = "acrcloudopsdev"
+}
+
+variable "acr_sku" {
+  description = "Development Azure Container Registry SKU."
+  type        = string
+  default     = "Standard"
+}

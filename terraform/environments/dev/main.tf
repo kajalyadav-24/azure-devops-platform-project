@@ -67,3 +67,13 @@ module "app_nsg" {
 
   tags = var.tags
 }
+module "acr" {
+  source = "../../modules/acr"
+
+  acr_name_prefix     = var.acr_name_prefix
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+  sku                 = var.acr_sku
+
+  tags = var.tags
+}
