@@ -21,3 +21,12 @@ output "subnet_ids" {
   description = "Development subnet IDs."
   value       = module.network.subnet_ids
 }
+output "aks_nsg_id" {
+  description = "AKS subnet NSG ID."
+  value       = module.aks_nsg.nsg_id
+}
+
+output "app_nsg_id" {
+  description = "Application subnet NSG ID."
+  value       = module.app_nsg.nsg_id
+}
