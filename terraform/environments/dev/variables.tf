@@ -67,3 +67,26 @@ variable "acr_sku" {
   type        = string
   default     = "Standard"
 }
+variable "aks_cluster_name" {
+  description = "Name of the development AKS cluster."
+  type        = string
+  default     = "aks-cloudops-dev"
+}
+
+variable "aks_dns_prefix" {
+  description = "DNS prefix for the development AKS cluster."
+  type        = string
+  default     = "cloudops-dev"
+}
+
+variable "aks_node_vm_size" {
+  description = "VM size for the development AKS system nodes."
+  type        = string
+  default     = "Standard_D4s_v4"
+}
+
+variable "aks_node_count" {
+  description = "Number of nodes in the development AKS system pool."
+  type        = number
+  default     = 2
+}

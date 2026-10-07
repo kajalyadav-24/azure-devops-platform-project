@@ -77,3 +77,20 @@ module "acr" {
 
   tags = var.tags
 }
+module "aks" {
+  source = "../../modules/aks"
+
+  cluster_name        = var.aks_cluster_name
+  dns_prefix          = var.aks_dns_prefix
+  location            = module.resource_group.location
+  resource_group_name = module.resource_group.name
+
+  aks_subnet_id = module.network.subnet_ids["snet-aks-dev"]
+
+  acr_id = module.acr.acr_id
+
+  node_vm_size = var.aks_node_vm_size
+  node_count   = var.aks_node_count
+
+  tags = var.tags
+}

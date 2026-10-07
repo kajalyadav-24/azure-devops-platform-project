@@ -44,3 +44,27 @@ output "acr_login_server" {
   description = "Development Azure Container Registry login server."
   value       = module.acr.login_server
 }
+output "aks_cluster_id" {
+  description = "Development AKS cluster resource ID."
+  value       = module.aks.cluster_id
+}
+
+output "aks_cluster_name" {
+  description = "Development AKS cluster name."
+  value       = module.aks.cluster_name
+}
+
+output "aks_node_resource_group" {
+  description = "AKS managed node Resource Group."
+  value       = module.aks.node_resource_group
+}
+
+output "aks_oidc_issuer_url" {
+  description = "AKS OIDC issuer URL."
+  value       = module.aks.oidc_issuer_url
+}
+
+output "aks_kubelet_identity_object_id" {
+  description = "AKS kubelet managed identity object ID."
+  value       = module.aks.kubelet_identity_object_id
+}
