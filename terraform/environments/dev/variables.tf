@@ -90,3 +90,7 @@ variable "aks_node_count" {
   type        = number
   default     = 2
 }
+variable "alert_email" {
+  description = "Email address for Azure Monitor alert notifications."
+  type        = string
+}

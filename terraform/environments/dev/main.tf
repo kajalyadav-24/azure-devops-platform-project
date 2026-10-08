@@ -89,8 +89,10 @@ module "aks" {
 
   acr_id = module.acr.acr_id
 
-  node_vm_size = var.aks_node_vm_size
-  node_count   = var.aks_node_count
+  node_vm_size               = var.aks_node_vm_size
+  node_count                 = var.aks_node_count
+  log_analytics_workspace_id = module.monitoring.workspace_id
+
 
   tags = var.tags
 }
@@ -114,4 +116,33 @@ module "key_vault" {
   service_account_name = "incident-app"
 
   tags = var.tags
+}
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  workspace_name      = "law-cloudops-dev"
+  location            = module.resource_group.location
+  resource_group_name = module.resource_group.name
+
+  retention_in_days = 30
+
+  alert_email = var.alert_email
+
+  tags = var.tags
+}
+
+module "container_insights" {
+  source = "../../modules/container-insights"
+
+  cluster_name        = "aks-cloudops-dev"
+  resource_group_name = module.resource_group.name
+  location            = module.resource_group.location
+
+  log_analytics_workspace_id = module.monitoring.workspace_id
+
+  tags = var.tags
+
+  depends_on = [
+    module.aks
+  ]
 }

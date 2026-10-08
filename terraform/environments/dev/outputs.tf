@@ -79,3 +79,10 @@ output "key_vault_uri" {
 output "workload_identity_client_id" {
   value = module.key_vault.workload_identity_client_id
 }
+output "log_analytics_workspace_id" {
+  value = module.monitoring.workspace_id
+}
+
+output "log_analytics_workspace_name" {
+  value = module.monitoring.workspace_name
+}
