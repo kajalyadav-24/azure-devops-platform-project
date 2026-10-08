@@ -13,7 +13,13 @@ resource "azurerm_container_registry" "this" {
   sku           = var.sku
   admin_enabled = false
 
-  public_network_access_enabled = true
+  # GitHub-hosted runners push images over the public endpoint; access is restricted by
+  # Azure RBAC (admin user disabled). Use a private endpoint + self-hosted runners in production.
+  public_network_access_enabled = true # NOSONAR
+
+  identity {
+    type = "SystemAssigned"
+  }
 
   tags = var.tags
 }
