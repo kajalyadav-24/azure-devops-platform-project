@@ -360,3 +360,16 @@ The project was not considered complete after resource creation alone. It was va
 ## Portfolio summary
 
 > Built an end-to-end Azure DevOps platform using Terraform, Docker, AKS, Helm, GitHub Actions, ACR, Key Vault, Workload Identity, Azure Monitor and Log Analytics. Implemented passwordless OIDC-based CI/CD, modular infrastructure as code, SHA-based container releases, autoscaling, centralized observability and alerting, and demonstrated production-style troubleshooting through a controlled `ImagePullBackOff` failure and Helm rollback.
+
+
+
+## Skills demonstrated
+
+Azure (AKS, ACR, Key Vault, Azure Monitor, Log Analytics), Terraform (modular IaC, remote state), Kubernetes and Helm, Docker, GitHub Actions CI/CD with OIDC, AKS Workload Identity, KQL, incident response and rollback, supply-chain hardening (SHA-pinned actions, hash-locked Python dependencies) and SonarQube Cloud quality gating.
+
+
+## Operational notes
+
+Key Vault purge protection is enabled. Once it is on it cannot be turned off, so after a terraform destroy the vault name stays reserved for the 7-day soft-delete retention period. Use a different vault name, or recover the soft-deleted vault, before re-applying.
+
+The public ACR endpoint is intentional for this project because GitHub-hosted runners push images to it. Access is restricted with Azure RBAC and the admin user is disabled. A production setup would use a private endpoint with self-hosted runners.
