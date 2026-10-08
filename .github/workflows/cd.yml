@@ -1,0 +1,110 @@
+name: CD - Deploy to AKS
+
+on:
+  workflow_run:
+    workflows:
+      - "CI - Build and Push Image"
+    types:
+      - completed
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloudops-dev-deployment
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: incident-app
+  HELM_RELEASE: incident-app
+
+jobs:
+  deploy:
+    name: Deploy to AKS with Helm
+
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout exact CI commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Login to Azure using OIDC
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.18.4
+
+      - name: Connect to AKS
+        uses: azure/aks-set-context@v5
+        with:
+          resource-group: ${{ vars.AKS_RESOURCE_GROUP }}
+          cluster-name: ${{ vars.AKS_CLUSTER_NAME }}
+
+      - name: Verify AKS connection
+        run: |
+          kubectl get nodes
+          kubectl get namespace ${{ vars.K8S_NAMESPACE }}
+
+      - name: Set image tag
+        run: |
+          echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
+
+      - name: Verify image exists in ACR
+        run: |
+          az acr repository show \
+            --name ${{ vars.ACR_NAME }} \
+            --image ${{ env.IMAGE_NAME }}:${IMAGE_TAG}
+
+      - name: Lint Helm chart
+        run: |
+          helm lint ./helm/incident-app
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install ${{ env.HELM_RELEASE }} \
+            ./helm/incident-app \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
+            --set-string image.repository=${{ vars.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }} \
+            --set-string image.tag=${IMAGE_TAG} \
+            --atomic \
+            --timeout 5m
+
+      - name: Verify Kubernetes rollout
+        run: |
+          kubectl rollout status deployment/incident-app \
+            -n ${{ vars.K8S_NAMESPACE }} \
+            --timeout=180s
+
+      - name: Show deployed image
+        run: |
+          kubectl get deployment incident-app \
+            -n ${{ vars.K8S_NAMESPACE }} \
+            -o jsonpath='{.spec.template.spec.containers[0].image}'
+
+          echo ""
+
+      - name: Show pods
+        run: |
+          kubectl get pods \
+            -n ${{ vars.K8S_NAMESPACE }} \
+            -o wide
+
+      - name: Show Helm release
+        run: |
+          helm list -n ${{ vars.K8S_NAMESPACE }}
