@@ -1,5 +1,26 @@
 # Azure DevOps Platform Project
 
+[![CI](https://github.com/kajalyadav-24/azure-devops-platform-project/actions/workflows/ci.yml/badge.svg)](https://github.com/kajalyadav-24/azure-devops-platform-project/actions/workflows/ci.yml) [![CD](https://github.com/kajalyadav-24/azure-devops-platform-project/actions/workflows/cd.yml/badge.svg)](https://github.com/kajalyadav-24/azure-devops-platform-project/actions/workflows/cd.yml) ![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&logoColor=white) ![Terraform](https://img.shields.io/badge/Terraform-844FBA?logo=terraform&logoColor=white) ![AKS](https://img.shields.io/badge/AKS-326CE5?logo=kubernetes&logoColor=white) ![Helm](https://img.shields.io/badge/Helm-0F1689?logo=helm&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?logo=githubactions&logoColor=white)
+
+> Terraform-provisioned Azure platform with keyless GitHub Actions CI/CD to AKS, Key Vault access via Workload Identity, Azure Monitor observability, and a documented incident rollback.
+
+![CloudOps dashboard running on AKS](docs/images/cloudops-dashboard.jpg)
+
+*The CloudOps dashboard served by the Flask app running on AKS (dev environment).*
+
+### At a glance
+
+| Area | What I built |
+|---|---|
+| Infrastructure | 8 Terraform modules, remote state in Azure Storage with locking |
+| CI/CD | GitHub Actions with GitHub OIDC login (no stored Azure secrets) and commit-SHA image tags |
+| Runtime | AKS, Helm, HPA (2 to 5 replicas), zero-downtime rolling updates |
+| Security | ACR admin disabled, AKS Workload Identity to Azure Key Vault, Azure RBAC |
+| Observability | Container Insights, Log Analytics, KQL queries, email alerting |
+| Reliability | Controlled ImagePullBackOff incident recovered with a Helm rollback |
+
+**Jump to:** [Architecture](docs/architecture.md) · [Runbook](docs/runbook.md) · [Incident response](docs/incident-response.md) · [Troubleshooting log](docs/troubleshooting-log.md)
+
 End-to-end Azure platform engineering project that provisions cloud infrastructure with Terraform, builds and publishes a containerized Flask application, deploys it to Azure Kubernetes Service with Helm, authenticates GitHub Actions to Azure through OIDC, accesses Azure Key Vault through AKS Workload Identity, and monitors the platform with Azure Monitor, Log Analytics, Container Insights, KQL, and alerting.
 
 This project is intentionally designed as a production-style learning and portfolio implementation rather than a single-service demo. It demonstrates infrastructure as code, containerization, Kubernetes operations, CI/CD, identity, observability, incident response, and rollback in one integrated workflow.
