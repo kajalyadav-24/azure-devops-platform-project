@@ -30,11 +30,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ---------------------------------------------------------
+      # 1. Checkout the exact commit that CI successfully built
+      # ---------------------------------------------------------
       - name: Checkout exact CI commit
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
+      # ---------------------------------------------------------
+      # 2. Login to Azure through GitHub OIDC
+      # No Azure client secret/password is stored in GitHub
+      # ---------------------------------------------------------
       - name: Login to Azure using OIDC
         uses: azure/login@v3
         with:
@@ -42,69 +49,156 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      # ---------------------------------------------------------
+      # 3. Install kubectl
+      # ---------------------------------------------------------
       - name: Install kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
+      # ---------------------------------------------------------
+      # 4. Install Helm
+      # ---------------------------------------------------------
       - name: Install Helm
-        uses: azure/setup-helm@v4
-        with:
-          version: v3.18.4
+        uses: azure/setup-helm@v5
 
+      # ---------------------------------------------------------
+      # 5. Connect GitHub runner to AKS
+      # ---------------------------------------------------------
       - name: Connect to AKS
         uses: azure/aks-set-context@v5
         with:
           resource-group: ${{ vars.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ vars.AKS_CLUSTER_NAME }}
 
+      # ---------------------------------------------------------
+      # 6. Verify AKS connectivity
+      # ---------------------------------------------------------
       - name: Verify AKS connection
         run: |
+          echo "Checking AKS nodes..."
           kubectl get nodes
+
+          echo "Checking namespace..."
           kubectl get namespace ${{ vars.K8S_NAMESPACE }}
 
+      # ---------------------------------------------------------
+      # 7. Validate required Workload Identity variable
+      # ---------------------------------------------------------
+      - name: Validate Workload Identity configuration
+        run: |
+          if [ -z "${{ vars.WORKLOAD_IDENTITY_CLIENT_ID }}" ]; then
+            echo "WORKLOAD_IDENTITY_CLIENT_ID repository variable is missing."
+            exit 1
+          fi
+
+          echo "Workload Identity configuration found."
+
+      # ---------------------------------------------------------
+      # 8. Use the same Git SHA that CI used for the Docker image
+      # ---------------------------------------------------------
       - name: Set image tag
         run: |
           echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
 
+      # ---------------------------------------------------------
+      # 9. Verify that CI actually pushed this image to ACR
+      # ---------------------------------------------------------
       - name: Verify image exists in ACR
         run: |
+          echo "Checking image:"
+          echo "${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_NAME}:${IMAGE_TAG}"
+
           az acr repository show \
             --name ${{ vars.ACR_NAME }} \
-            --image ${{ env.IMAGE_NAME }}:${IMAGE_TAG}
+            --image "${IMAGE_NAME}:${IMAGE_TAG}" \
+            --output table
 
+      # ---------------------------------------------------------
+      # 10. Validate Helm chart before deployment
+      # ---------------------------------------------------------
       - name: Lint Helm chart
         run: |
           helm lint ./helm/incident-app
 
+      # ---------------------------------------------------------
+      # 11. Deploy application using Helm
+      #
+      # Important:
+      # - image.tag = exact Git commit SHA
+      # - workloadIdentity.clientId preserves the ServiceAccount
+      #   managed identity annotation
+      # - rollback-on-failure protects the previous working release
+      # ---------------------------------------------------------
       - name: Deploy with Helm
         run: |
-          helm upgrade --install ${{ env.HELM_RELEASE }} \
+          helm upgrade --install "${HELM_RELEASE}" \
             ./helm/incident-app \
             --namespace ${{ vars.K8S_NAMESPACE }} \
-            --set-string image.repository=${{ vars.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }} \
-            --set-string image.tag=${IMAGE_TAG} \
-            --atomic \
+            --set-string image.repository="${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_NAME}" \
+            --set-string image.tag="${IMAGE_TAG}" \
+            --set-string workloadIdentity.clientId="${{ vars.WORKLOAD_IDENTITY_CLIENT_ID }}" \
+            --rollback-on-failure \
+            --wait \
             --timeout 5m
 
+      # ---------------------------------------------------------
+      # 12. Verify Kubernetes rollout completed successfully
+      # ---------------------------------------------------------
       - name: Verify Kubernetes rollout
         run: |
           kubectl rollout status deployment/incident-app \
-            -n ${{ vars.K8S_NAMESPACE }} \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
             --timeout=180s
 
+      # ---------------------------------------------------------
+      # 13. Verify the exact Docker image running in AKS
+      # ---------------------------------------------------------
       - name: Show deployed image
         run: |
+          echo "Image running in AKS:"
+
           kubectl get deployment incident-app \
-            -n ${{ vars.K8S_NAMESPACE }} \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
             -o jsonpath='{.spec.template.spec.containers[0].image}'
 
           echo ""
 
+      # ---------------------------------------------------------
+      # 14. Verify Workload Identity ServiceAccount
+      # ---------------------------------------------------------
+      - name: Verify Workload Identity
+        run: |
+          echo "ServiceAccount:"
+          kubectl get serviceaccount incident-app \
+            --namespace ${{ vars.K8S_NAMESPACE }}
+
+          echo ""
+          echo "Workload Identity client ID annotation:"
+
+          kubectl get serviceaccount incident-app \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
+            -o jsonpath='{.metadata.annotations.azure\.workload\.identity/client-id}'
+
+          echo ""
+
+      # ---------------------------------------------------------
+      # 15. Show running pods
+      # ---------------------------------------------------------
       - name: Show pods
         run: |
           kubectl get pods \
-            -n ${{ vars.K8S_NAMESPACE }} \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
             -o wide
 
+      # ---------------------------------------------------------
+      # 16. Show Helm release
+      # ---------------------------------------------------------
       - name: Show Helm release
         run: |
-          helm list -n ${{ vars.K8S_NAMESPACE }}
+          helm list \
+            --namespace ${{ vars.K8S_NAMESPACE }}
+
+          echo ""
+
+          helm history "${HELM_RELEASE}" \
+            --namespace ${{ vars.K8S_NAMESPACE }}
