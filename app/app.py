@@ -10,7 +10,7 @@ from azure.keyvault.secrets import SecretClient
 # ---------------------------------------------------------
 # Flask application
 # ---------------------------------------------------------
-app = Flask(__name__)  # NOSONAR
+app = Flask(__name__)  # NOSONAR - read-only dashboard/API: no forms, cookies or state changes, so CSRF protection is not needed
 
 
 # ---------------------------------------------------------
