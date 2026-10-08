@@ -25,7 +25,8 @@ jobs:
 
     if: >
       github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.head_branch == 'main'
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
 
     runs-on: ubuntu-latest
 
@@ -34,7 +35,7 @@ jobs:
       # 1. Checkout the exact commit successfully built by CI
       # ---------------------------------------------------------
       - name: Checkout exact CI commit
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
 
@@ -42,7 +43,7 @@ jobs:
       # 2. Login to Azure using GitHub OIDC
       # ---------------------------------------------------------
       - name: Login to Azure using OIDC
-        uses: azure/login@v3
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
@@ -52,19 +53,19 @@ jobs:
       # 3. Install kubectl
       # ---------------------------------------------------------
       - name: Install kubectl
-        uses: azure/setup-kubectl@v5
+        uses: azure/setup-kubectl@bda439f5f36b99b262ebdcd3613869bddb064c8e # v5
 
       # ---------------------------------------------------------
       # 4. Install Helm
       # ---------------------------------------------------------
       - name: Install Helm
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
 
       # ---------------------------------------------------------
       # 5. Connect GitHub Actions runner to AKS
       # ---------------------------------------------------------
       - name: Connect to AKS
-        uses: azure/aks-set-context@v5
+        uses: azure/aks-set-context@883bdc8d8d1d0fd87e66cc4ba6f0b618f9eb5281 # v5
         with:
           resource-group: ${{ vars.AKS_RESOURCE_GROUP }}
           cluster-name: ${{ vars.AKS_CLUSTER_NAME }}
