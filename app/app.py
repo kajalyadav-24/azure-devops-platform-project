@@ -10,7 +10,7 @@ from azure.keyvault.secrets import SecretClient
 # ---------------------------------------------------------
 # Flask application
 # ---------------------------------------------------------
-app = Flask(__name__)  # NOSONAR: read-only dashboard/API, no state-changing forms or cookies
+app = Flask(__name__)  # NOSONAR
 
 
 # ---------------------------------------------------------
