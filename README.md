@@ -111,47 +111,47 @@ The implementation was validated with live pod inventory, application logs, Kube
 
 ```text
 azure-devops-platform-project/
-â”œâ”€â”€ .github/
-â”‚   â””â”€â”€ workflows/
-â”‚       â”œâ”€â”€ ci.yml
-â”‚       â””â”€â”€ cd.yml
-â”œâ”€â”€ app/
-â”‚   â”œâ”€â”€ app.py
-â”‚   â”œâ”€â”€ Dockerfile
-â”‚   â”œâ”€â”€ requirements.txt
-â”‚   â”œâ”€â”€ static/
-â”‚   â””â”€â”€ templates/
-â”œâ”€â”€ docs/
-â”‚   â”œâ”€â”€ architecture.md
-â”‚   â”œâ”€â”€ incident-response.md
-â”‚   â”œâ”€â”€ kql-cheatsheet.md
-â”‚   â”œâ”€â”€ project-handbook.md
-â”‚   â”œâ”€â”€ repo-management.md
-â”‚   â”œâ”€â”€ runbook.md
-â”‚   â””â”€â”€ troubleshooting-log.md
-â”œâ”€â”€ helm/
-â”‚   â””â”€â”€ incident-app/
-â”‚       â”œâ”€â”€ Chart.yaml
-â”‚       â”œâ”€â”€ values.yaml
-â”‚       â””â”€â”€ templates/
-â”œâ”€â”€ kubernetes/
-â”‚   â””â”€â”€ base/
-â”œâ”€â”€ scripts/
-â”‚   â””â”€â”€ repo-health-check.ps1
-â”œâ”€â”€ terraform/
-â”‚   â”œâ”€â”€ bootstrap/
-â”‚   â”œâ”€â”€ environments/dev/
-â”‚   â””â”€â”€ modules/
-â”‚       â”œâ”€â”€ resource-group/
-â”‚       â”œâ”€â”€ network/
-â”‚       â”œâ”€â”€ nsg/
-â”‚       â”œâ”€â”€ acr/
-â”‚       â”œâ”€â”€ aks/
-â”‚       â”œâ”€â”€ key-vault/
-â”‚       â”œâ”€â”€ monitoring/
-â”‚       â””â”€â”€ container-insights/
-â”œâ”€â”€ .gitignore
-â””â”€â”€ README.md
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── cd.yml
+├── app/
+│   ├── app.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── static/
+│   └── templates/
+├── docs/
+│   ├── architecture.md
+│   ├── incident-response.md
+│   ├── kql-cheatsheet.md
+│   ├── project-handbook.md
+│   ├── repo-management.md
+│   ├── runbook.md
+│   └── troubleshooting-log.md
+├── helm/
+│   └── incident-app/
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/
+├── kubernetes/
+│   └── base/
+├── scripts/
+│   └── repo-health-check.ps1
+├── terraform/
+│   ├── bootstrap/
+│   ├── environments/dev/
+│   └── modules/
+│       ├── resource-group/
+│       ├── network/
+│       ├── nsg/
+│       ├── acr/
+│       ├── aks/
+│       ├── key-vault/
+│       ├── monitoring/
+│       └── container-insights/
+├── .gitignore
+└── README.md
 ```
 
 Local/generated folders such as `.venv`, `.terraform`, `__pycache__`, plan files, and Terraform state should not be committed.
@@ -328,13 +328,13 @@ The project was not considered complete after resource creation alone. It was va
 
 ## Documentation
 
-- [`docs/architecture.md`](docs/architecture.md) â€” architecture and flows.
-- [`docs/runbook.md`](docs/runbook.md) â€” day-2 operational procedures.
-- [`docs/incident-response.md`](docs/incident-response.md) â€” controlled incident, RCA, and rollback.
-- [`docs/project-handbook.md`](docs/project-handbook.md) â€” implementation process and command handbook.
-- [`docs/troubleshooting-log.md`](docs/troubleshooting-log.md) â€” issues encountered and lessons learned.
-- [`docs/kql-cheatsheet.md`](docs/kql-cheatsheet.md) â€” monitoring queries.
-- [`docs/repo-management.md`](docs/repo-management.md) â€” repository hygiene and finalization checklist.
+- [`docs/architecture.md`](docs/architecture.md) — architecture and flows.
+- [`docs/runbook.md`](docs/runbook.md) — day-2 operational procedures.
+- [`docs/incident-response.md`](docs/incident-response.md) — controlled incident, RCA, and rollback.
+- [`docs/project-handbook.md`](docs/project-handbook.md) — implementation process and command handbook.
+- [`docs/troubleshooting-log.md`](docs/troubleshooting-log.md) — issues encountered and lessons learned.
+- [`docs/kql-cheatsheet.md`](docs/kql-cheatsheet.md) — monitoring queries.
+- [`docs/repo-management.md`](docs/repo-management.md) — repository hygiene and finalization checklist.
 
 ## Portfolio summary
 
