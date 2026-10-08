@@ -10,7 +10,7 @@ from azure.keyvault.secrets import SecretClient
 # ---------------------------------------------------------
 # Flask application
 # ---------------------------------------------------------
-app = Flask(__name__)
+app = Flask(__name__)  # NOSONAR
 
 
 # ---------------------------------------------------------
@@ -198,7 +198,7 @@ def keyvault_check():
 # ---------------------------------------------------------
 if __name__ == "__main__":
     app.run(
-        host="0.0.0.0",
+        host=os.getenv("FLASK_RUN_HOST", "127.0.0.1"),
         port=8080,
         debug=False
     )

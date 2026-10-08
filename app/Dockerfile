@@ -1,4 +1,4 @@
-﻿FROM python:3.13-slim
+FROM python:3.13-slim
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ ENV ENVIRONMENT=dev
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --require-hashes --only-binary :all: -r requirements.txt
 
 COPY app.py .
 COPY templates ./templates

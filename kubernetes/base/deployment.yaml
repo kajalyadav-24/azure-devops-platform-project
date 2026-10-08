@@ -32,6 +32,8 @@ spec:
         environment: dev
 
     spec:
+      automountServiceAccountToken: false
+
       containers:
         - name: incident-app
 
