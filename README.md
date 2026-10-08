@@ -124,7 +124,6 @@ azure-devops-platform-project/
 â”œâ”€â”€ docs/
 â”‚   â”œâ”€â”€ architecture.md
 â”‚   â”œâ”€â”€ incident-response.md
-â”‚   â”œâ”€â”€ interview-guide.md
 â”‚   â”œâ”€â”€ kql-cheatsheet.md
 â”‚   â”œâ”€â”€ project-handbook.md
 â”‚   â”œâ”€â”€ repo-management.md
@@ -335,7 +334,6 @@ The project was not considered complete after resource creation alone. It was va
 - [`docs/project-handbook.md`](docs/project-handbook.md) â€” implementation process and command handbook.
 - [`docs/troubleshooting-log.md`](docs/troubleshooting-log.md) â€” issues encountered and lessons learned.
 - [`docs/kql-cheatsheet.md`](docs/kql-cheatsheet.md) â€” monitoring queries.
-- [`docs/interview-guide.md`](docs/interview-guide.md) â€” interview-ready project explanation and Q&A.
 - [`docs/repo-management.md`](docs/repo-management.md) â€” repository hygiene and finalization checklist.
 
 ## Portfolio summary
