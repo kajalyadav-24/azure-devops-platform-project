@@ -94,3 +94,24 @@ module "aks" {
 
   tags = var.tags
 }
+data "azurerm_client_config" "current" {}
+
+module "key_vault" {
+  source = "../../modules/key-vault"
+
+  name_prefix = "kv-cloudops-dev"
+
+  location            = module.resource_group.location
+  resource_group_name = module.resource_group.name
+
+  tenant_id = data.azurerm_client_config.current.tenant_id
+
+  workload_identity_name = "id-incident-app-dev"
+
+  oidc_issuer_url = module.aks.oidc_issuer_url
+
+  kubernetes_namespace = "cloudops-dev"
+  service_account_name = "incident-app"
+
+  tags = var.tags
+}

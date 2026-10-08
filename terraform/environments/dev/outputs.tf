@@ -68,3 +68,14 @@ output "aks_kubelet_identity_object_id" {
   description = "AKS kubelet managed identity object ID."
   value       = module.aks.kubelet_identity_object_id
 }
+output "key_vault_name" {
+  value = module.key_vault.key_vault_name
+}
+
+output "key_vault_uri" {
+  value = module.key_vault.key_vault_uri
+}
+
+output "workload_identity_client_id" {
+  value = module.key_vault.workload_identity_client_id
+}
