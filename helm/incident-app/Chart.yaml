@@ -1,6 +1,9 @@
 ﻿apiVersion: v2
 name: incident-app
-description: Helm chart for Azure DevOps Incident Application
+description: Helm chart for the CloudOps Incident Management application
+
 type: application
+
 version: 0.1.0
+
 appVersion: "1.0.0"

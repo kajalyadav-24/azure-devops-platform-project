@@ -1,18 +1,19 @@
+{{- if .Values.hpa.enabled }}
+
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 
 metadata:
-  name: incident-app
-  namespace: cloudops-dev
+  name: {{ .Release.Name }}
 
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: incident-app
+    name: {{ .Release.Name }}
 
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: {{ .Values.hpa.minReplicas }}
+  maxReplicas: {{ .Values.hpa.maxReplicas }}
 
   metrics:
     - type: Resource
@@ -20,11 +21,12 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 60
+          averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }}
 
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 0
+
       policies:
         - type: Pods
           value: 2
@@ -32,8 +34,10 @@ spec:
 
     scaleDown:
       stabilizationWindowSeconds: 60
+
       policies:
         - type: Pods
           value: 1
           periodSeconds: 60
 
+{{- end }}

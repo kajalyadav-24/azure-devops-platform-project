@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: incident-app
+  namespace: cloudops-dev
+
+  labels:
+    app: incident-app
+    app.kubernetes.io/part-of: cloudops-platform
+    environment: dev
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: incident-app
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+
+  template:
+    metadata:
+      labels:
+        app: incident-app
+        app.kubernetes.io/part-of: cloudops-platform
+        environment: dev
+
+    spec:
+      containers:
+        - name: incident-app
+
+          image: acrcloudopsdevw9yni0.azurecr.io/incident-app:1.0.0
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+
+          env:
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: incident-app-config
+                  key: ENVIRONMENT
+
+            - name: APP_VERSION
+              value: "1.0.0"
+
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3

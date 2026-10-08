@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: incident-app-config
+  namespace: cloudops-dev
+
+  labels:
+    app: incident-app
+    app.kubernetes.io/part-of: cloudops-platform
+    environment: dev
+
+data:
+  ENVIRONMENT: "dev"
+
