@@ -31,7 +31,7 @@ jobs:
 
     steps:
       # ---------------------------------------------------------
-      # 1. Checkout the exact commit that CI successfully built
+      # 1. Checkout the exact commit successfully built by CI
       # ---------------------------------------------------------
       - name: Checkout exact CI commit
         uses: actions/checkout@v7
@@ -39,8 +39,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha }}
 
       # ---------------------------------------------------------
-      # 2. Login to Azure through GitHub OIDC
-      # No Azure client secret/password is stored in GitHub
+      # 2. Login to Azure using GitHub OIDC
       # ---------------------------------------------------------
       - name: Login to Azure using OIDC
         uses: azure/login@v3
@@ -62,7 +61,7 @@ jobs:
         uses: azure/setup-helm@v5
 
       # ---------------------------------------------------------
-      # 5. Connect GitHub runner to AKS
+      # 5. Connect GitHub Actions runner to AKS
       # ---------------------------------------------------------
       - name: Connect to AKS
         uses: azure/aks-set-context@v5
@@ -71,37 +70,48 @@ jobs:
           cluster-name: ${{ vars.AKS_CLUSTER_NAME }}
 
       # ---------------------------------------------------------
-      # 6. Verify AKS connectivity
+      # 6. Verify AKS connection
       # ---------------------------------------------------------
       - name: Verify AKS connection
         run: |
           echo "Checking AKS nodes..."
           kubectl get nodes
 
+          echo ""
           echo "Checking namespace..."
           kubectl get namespace ${{ vars.K8S_NAMESPACE }}
 
       # ---------------------------------------------------------
-      # 7. Validate required Workload Identity variable
+      # 7. Validate required repository variables
       # ---------------------------------------------------------
-      - name: Validate Workload Identity configuration
+      - name: Validate deployment configuration
         run: |
           if [ -z "${{ vars.WORKLOAD_IDENTITY_CLIENT_ID }}" ]; then
-            echo "WORKLOAD_IDENTITY_CLIENT_ID repository variable is missing."
+            echo "WORKLOAD_IDENTITY_CLIENT_ID is missing."
             exit 1
           fi
 
-          echo "Workload Identity configuration found."
+          if [ -z "${{ vars.KEY_VAULT_URI }}" ]; then
+            echo "KEY_VAULT_URI is missing."
+            exit 1
+          fi
+
+          if [ -z "${{ vars.ACR_NAME }}" ]; then
+            echo "ACR_NAME is missing."
+            exit 1
+          fi
+
+          echo "Required deployment variables are configured."
 
       # ---------------------------------------------------------
-      # 8. Use the same Git SHA that CI used for the Docker image
+      # 8. Use the exact Git SHA produced by CI
       # ---------------------------------------------------------
       - name: Set image tag
         run: |
           echo "IMAGE_TAG=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_ENV
 
       # ---------------------------------------------------------
-      # 9. Verify that CI actually pushed this image to ACR
+      # 9. Verify that CI pushed the image into ACR
       # ---------------------------------------------------------
       - name: Verify image exists in ACR
         run: |
@@ -114,20 +124,14 @@ jobs:
             --output table
 
       # ---------------------------------------------------------
-      # 10. Validate Helm chart before deployment
+      # 10. Validate Helm chart
       # ---------------------------------------------------------
       - name: Lint Helm chart
         run: |
           helm lint ./helm/incident-app
 
       # ---------------------------------------------------------
-      # 11. Deploy application using Helm
-      #
-      # Important:
-      # - image.tag = exact Git commit SHA
-      # - workloadIdentity.clientId preserves the ServiceAccount
-      #   managed identity annotation
-      # - rollback-on-failure protects the previous working release
+      # 11. Deploy application to AKS using Helm
       # ---------------------------------------------------------
       - name: Deploy with Helm
         run: |
@@ -137,12 +141,13 @@ jobs:
             --set-string image.repository="${{ vars.ACR_NAME }}.azurecr.io/${IMAGE_NAME}" \
             --set-string image.tag="${IMAGE_TAG}" \
             --set-string workloadIdentity.clientId="${{ vars.WORKLOAD_IDENTITY_CLIENT_ID }}" \
+            --set-string keyVault.uri="${{ vars.KEY_VAULT_URI }}" \
             --rollback-on-failure \
             --wait \
             --timeout 5m
 
       # ---------------------------------------------------------
-      # 12. Verify Kubernetes rollout completed successfully
+      # 12. Verify Kubernetes rollout
       # ---------------------------------------------------------
       - name: Verify Kubernetes rollout
         run: |
@@ -151,7 +156,7 @@ jobs:
             --timeout=180s
 
       # ---------------------------------------------------------
-      # 13. Verify the exact Docker image running in AKS
+      # 13. Show exact image deployed to AKS
       # ---------------------------------------------------------
       - name: Show deployed image
         run: |
@@ -173,7 +178,7 @@ jobs:
             --namespace ${{ vars.K8S_NAMESPACE }}
 
           echo ""
-          echo "Workload Identity client ID annotation:"
+          echo "Managed Identity client ID annotation:"
 
           kubectl get serviceaccount incident-app \
             --namespace ${{ vars.K8S_NAMESPACE }} \
@@ -182,7 +187,20 @@ jobs:
           echo ""
 
       # ---------------------------------------------------------
-      # 15. Show running pods
+      # 15. Verify Key Vault URI passed to deployment
+      # ---------------------------------------------------------
+      - name: Verify Key Vault configuration
+        run: |
+          echo "KEY_VAULT_URI configured in deployment:"
+
+          kubectl get deployment incident-app \
+            --namespace ${{ vars.K8S_NAMESPACE }} \
+            -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KEY_VAULT_URI")].value}'
+
+          echo ""
+
+      # ---------------------------------------------------------
+      # 16. Show running pods
       # ---------------------------------------------------------
       - name: Show pods
         run: |
@@ -191,7 +209,7 @@ jobs:
             -o wide
 
       # ---------------------------------------------------------
-      # 16. Show Helm release
+      # 17. Show Helm release and history
       # ---------------------------------------------------------
       - name: Show Helm release
         run: |
