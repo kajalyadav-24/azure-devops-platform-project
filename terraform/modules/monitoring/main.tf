@@ -53,7 +53,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "incident_app_errors" 
   enabled  = true
 
   evaluation_frequency = "PT5M"
-  window_duration       = "PT5M"
+  window_duration      = "PT5M"
 
   criteria {
     query = <<-QUERY
